@@ -1,13 +1,35 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterDto } from '../auth/dto/register.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.user.findMany({
+  async create(dto: RegisterDto) {
+    const existing = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: dto.email }, { username: dto.username }],
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException('Email yoki username band');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+
+    return this.prisma.user.create({
+      data: {
+        email: dto.email,
+        username: dto.username,
+        passwordHash,
+      },
       select: {
         id: true,
         email: true,
@@ -19,7 +41,13 @@ export class UsersService {
     });
   }
 
-  async findOne(id: string) {
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+    });
+  }
+
+  async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -32,30 +60,15 @@ export class UsersService {
       },
     });
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('User topilmadi');
+
     return user;
   }
 
-  async update(id: string, dto: UpdateUserDto) {
-    await this.findOne(id);
-
+  async updateRefreshToken(id: string, refreshToken: string | null) {
     return this.prisma.user.update({
       where: { id },
-      data: dto,
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        avatar: true,
-        role: true,
-        updatedAt: true,
-      },
+      data: { refreshToken },
     });
-  }
-
-  async remove(id: string) {
-    await this.findOne(id);
-    await this.prisma.user.delete({ where: { id } });
-    return { message: 'User deleted successfully' };
   }
 }
