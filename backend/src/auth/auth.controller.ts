@@ -1,34 +1,81 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtRefreshGuard } from 'src/common/guards/jwt-refresh.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { Public } from 'src/common/decorators/public.decorator';
+import { Request } from 'express';
 
+interface RequestWithUser extends Request {
+  user: {
+    sub: string;
+    email: string;
+    refreshToken?: string;
+  };
+}
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  // ==================== REGISTER ====================
+  @Public()
+  @Post('register')
+  @ApiOperation({ summary: 'Yangi foydalanuvchi ro\'ylxatdan o\'tishi' })
+  @ApiResponse({ status: 201, description: 'Muvaffaqiyatli ro\'yxatdan o\'tildi' })
+  @ApiResponse({ status: 409, description: 'Email yoki username band' })
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  // ==================== LOGIN ====================
+  @Public()
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Tizimga kirish' })
+  @ApiResponse({ status: 200, description: 'Muvaffaqiyatli kirildi' })
+  @ApiResponse({ status: 401, description: 'Email yoki parol noto\'g\'ri' })
+  async login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  // ==================== REFRESH ====================
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('refresh-token')
+  @ApiOperation({ summary: 'Access tokenni yangilash' })
+  @ApiResponse({ status: 200, description: 'Tokenlar yangilandi' })
+  @ApiResponse({ status: 401, description: 'Refresh token noto\'g\'ri' })
+  async refresh(@Req() req: RequestWithUser) {
+    return this.authService.refresh(req.user.sub, req.user.refreshToken!);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  // ==================== LOGOUT ====================
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Tizimdan chiqish' })
+  @ApiResponse({ status: 200, description: 'Muvaffaqiyatli chiqildi' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async logout(@Req() req: RequestWithUser) {
+    return this.authService.logout(req.user.sub);
   }
 }

@@ -24,19 +24,12 @@ export class UsersService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
+    // select yo'q — to'liq user qaytadi (auth.service safeUser ajratadi)
     return this.prisma.user.create({
       data: {
         email: dto.email,
         username: dto.username,
         passwordHash,
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        avatar: true,
-        role: true,
-        createdAt: true,
       },
     });
   }
@@ -50,14 +43,7 @@ export class UsersService {
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        avatar: true,
-        role: true,
-        createdAt: true,
-      },
+      // select yo'q — to'liq user qaytadi
     });
 
     if (!user) throw new NotFoundException('User topilmadi');

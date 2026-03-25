@@ -27,9 +27,9 @@ export class AuthService {
     const user = await this.usersService.create(dto);
     const tokens = await this.generateTokens(user.id, user.email);
 
-    await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
+    const { passwordHash, refreshToken, ...safeUser } = user;
 
-    return { user, ...tokens };
+    return { user: safeUser, ...tokens };
   }
 
   // ==================== LOGIN ====================
@@ -37,17 +37,16 @@ export class AuthService {
     const user = await this.usersService.findByEmail(dto.email);
 
     if (!user) {
-      throw new UnauthorizedException('Email yoki parol noto\'g\'ri');
+      throw new UnauthorizedException("Email yoki parol noto'g'ri");
     }
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Email yoki parol noto\'g\'ri');
+      throw new UnauthorizedException("Email yoki parol noto'g'ri");
     }
 
     const tokens = await this.generateTokens(user.id, user.email);
-    await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
 
     const { passwordHash, refreshToken, ...safeUser } = user;
 
@@ -57,20 +56,18 @@ export class AuthService {
   // ==================== REFRESH ====================
   async refresh(userId: string, refreshToken: string) {
     const user = await this.usersService.findById(userId);
-    const dbUser = await this.usersService.findByEmail(user.email);
 
-    if (!dbUser?.refreshToken) {
+    if (!user?.refreshToken) {
       throw new UnauthorizedException('Refresh token topilmadi');
     }
 
-    const isValid = await bcrypt.compare(refreshToken, dbUser.refreshToken);
+    const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!isValid) {
-      throw new UnauthorizedException('Refresh token noto\'g\'ri');
+      throw new UnauthorizedException("Refresh token noto'g'ri");
     }
 
     const tokens = await this.generateTokens(user.id, user.email);
-    await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
 
     return tokens;
   }
