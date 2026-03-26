@@ -14,7 +14,6 @@ async function bootstrap() {
     }),
   );
 
-  // swagger setup
   const config = new DocumentBuilder()
     .setTitle('Movie App API')
     .setDescription('Movie App API Documentation')
