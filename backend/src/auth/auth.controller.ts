@@ -6,6 +6,7 @@ import {
   HttpStatus,
   UseGuards,
   Req,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,14 +17,14 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { JwtRefreshGuard } from 'src/common/guards/jwt-refresh.guard';
+import { JwtRefreshGuard } from '@/common/guards/jwt-refresh.guard';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 import { Request } from 'express';
 
 interface RequestWithUser extends Request {
   user: {
-    sub: string;
+    id: string;
     email: string;
     refreshToken?: string;
   };
@@ -37,8 +38,11 @@ export class AuthController {
   // ==================== REGISTER ====================
   @Public()
   @Post('register')
-  @ApiOperation({ summary: 'Yangi foydalanuvchi ro\'ylxatdan o\'tishi' })
-  @ApiResponse({ status: 201, description: 'Muvaffaqiyatli ro\'yxatdan o\'tildi' })
+  @ApiOperation({ summary: "Yangi foydalanuvchi ro'ylxatdan o'tishi" })
+  @ApiResponse({
+    status: 201,
+    description: "Muvaffaqiyatli ro'yxatdan o'tildi",
+  })
   @ApiResponse({ status: 409, description: 'Email yoki username band' })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
@@ -50,7 +54,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Tizimga kirish' })
   @ApiResponse({ status: 200, description: 'Muvaffaqiyatli kirildi' })
-  @ApiResponse({ status: 401, description: 'Email yoki parol noto\'g\'ri' })
+  @ApiResponse({ status: 401, description: "Email yoki parol noto'g'ri" })
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
@@ -62,10 +66,10 @@ export class AuthController {
   @ApiBearerAuth('refresh-token')
   @ApiOperation({ summary: 'Access tokenni yangilash' })
   @ApiResponse({ status: 200, description: 'Tokenlar yangilandi' })
-  @ApiResponse({ status: 401, description: 'Refresh token noto\'g\'ri' })
+  @ApiResponse({ status: 401, description: "Refresh token noto'g'ri" })
   async refresh(@Req() req: RequestWithUser) {
-    return this.authService.refresh(req.user.sub, req.user.refreshToken!);
-  }
+  return this.authService.refresh(req.user.id, req.user.refreshToken!); 
+}
 
   // ==================== LOGOUT ====================
   @UseGuards(JwtAuthGuard)
@@ -76,6 +80,18 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Muvaffaqiyatli chiqildi' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async logout(@Req() req: RequestWithUser) {
-    return this.authService.logout(req.user.sub);
+    return this.authService.logout(req.user.id);
+  }
+
+  // ME
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Joriy foydalanuvchi ma\'lumotlari' })
+  @ApiResponse({ status: 200, description: 'Foydalanuvchi ma\'lumotlari' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async me(@Req() req: RequestWithUser) {
+    return this.authService.getMe(req.user.id); 
   }
 }

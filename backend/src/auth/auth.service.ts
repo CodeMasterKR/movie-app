@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // ==================== REGISTER ====================
+  // REGISTER 
   async register(dto: RegisterDto) {
     const existing = await this.usersService.findByEmail(dto.email);
 
@@ -32,7 +32,7 @@ export class AuthService {
     return { user: safeUser, ...tokens };
   }
 
-  // ==================== LOGIN ====================
+  // LOGIN 
   async login(dto: LoginDto) {
     const user = await this.usersService.findByEmail(dto.email);
 
@@ -53,7 +53,7 @@ export class AuthService {
     return { user: safeUser, ...tokens };
   }
 
-  // ==================== REFRESH ====================
+  // REFRESH
   async refresh(userId: string, refreshToken: string) {
     const user = await this.usersService.findById(userId);
 
@@ -72,13 +72,20 @@ export class AuthService {
     return tokens;
   }
 
-  // ==================== LOGOUT ====================
+  // LOGOUT
   async logout(userId: string) {
     await this.usersService.updateRefreshToken(userId, null);
     return { message: 'Muvaffaqiyatli chiqildi' };
   }
 
-  // ==================== GENERATE TOKENS ====================
+  // ME
+  async getMe(userId: string) {
+    const user = await this.usersService.findById(userId);
+    const { passwordHash, refreshToken, ...safeUser } = user;
+    return safeUser;
+  }
+
+  // GENERATE TOKENS 
   private async generateTokens(userId: string, email: string) {
     const payload = { sub: userId, email };
 

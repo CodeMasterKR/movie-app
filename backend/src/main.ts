@@ -19,6 +19,10 @@ async function bootstrap() {
     .setDescription('Movie App API Documentation')
     .setVersion('1.0')
     .addBearerAuth()
+    .addBearerAuth(  
+    { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+    'refresh-token' 
+  )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
