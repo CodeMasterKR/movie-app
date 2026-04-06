@@ -14,6 +14,12 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: 'http://localhost:3001', 
+    methods: ['GET', 'POST','PUT', 'DELETE', 'PATCH'],
+    credentials: true, 
+  })
+
   const config = new DocumentBuilder()
     .setTitle('Movie App API')
     .setDescription('Movie App API Documentation')

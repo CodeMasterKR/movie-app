@@ -7,7 +7,7 @@ export class LoginDto {
     description: 'Foydanaluvchi email manzili',
   })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty({ 
     example: '123456',
@@ -16,5 +16,5 @@ export class LoginDto {
   })
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 }
