@@ -7,7 +7,7 @@ export class RegisterDto {
     description: 'Foydalanuvchi email manzili',
   })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty({
     example: 'kamronbek',
@@ -18,7 +18,7 @@ export class RegisterDto {
   @IsString()
   @MinLength(3)
   @MaxLength(20)
-  username: string;
+  username!: string;
 
   @ApiProperty({
     example: '123456',
@@ -27,5 +27,5 @@ export class RegisterDto {
   })
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 }
