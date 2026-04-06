@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useLogin } from '@/hooks/use-auth'
+import { useRouter } from 'next/navigation'
 
 const loginSchema = z.object({
   email: z.string().email("Email noto'g'ri"),
@@ -14,6 +15,8 @@ type LoginForm = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const { mutate: login, isPending, isError } = useLogin()
+
+  const router = useRouter()
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -38,7 +41,7 @@ export default function LoginPage() {
           onSubmit={form.handleSubmit(onSubmit)} 
           className='w-4/5 flex flex-col gap-y-6'
         >
-          <h1 className='text-5xl font-semibold text-white'>Tizimga Kirish</h1>
+          <h1 className='text-4xl font-semibold text-white'>Tizimga Kirish</h1>
 
           {/* Email */}
           <div className='flex flex-col gap-y-2'>
@@ -92,10 +95,14 @@ export default function LoginPage() {
 
           {/* Links */}
           <div className='flex justify-start gap-x-4 text-sm'>
-            <span className='text-white hover:text-gray-400 cursor-pointer'>
+            <span className='text-white hover:text-gray-400 cursor-pointer'
+              onClick={() => router.push('/auth/register')}
+            >
               Ro'yxatdan o'tish
             </span>
-            <span className='text-amber-200 hover:text-amber-300 cursor-pointer'>
+            <span className='text-amber-200 hover:text-amber-300 cursor-pointer'
+              onClick={() => router.push('/auth/forget-password')}
+            >
               Parolni Unutdim
             </span>
           </div>

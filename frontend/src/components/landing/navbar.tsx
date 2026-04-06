@@ -22,9 +22,9 @@ export const Navbar = () => {
   }, [])
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <nav className={`fixed top-7 left-20 right-20 z-50 transition-all duration-300 rounded-[20px] ${
       isScrolled
-        ? 'bg-black/95 backdrop-blur-md shadow-lg shadow-black/20'
+        ? 'bg-black/15 backdrop-blur-md shadow-lg shadow-black/20 border-emerald-500 border'
         : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">

@@ -40,7 +40,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: (data: RegisterDto) => authService.register(data),
     onSuccess: () => {
-      router.push('/login')
+      router.push('/auth/login')
     },
   })
 }
@@ -53,7 +53,7 @@ export const useLogout = () => {
     mutationFn: () => authService.logout(),
     onSuccess: () => {
       logout()
-      router.push('/login')
+      router.push('/auth/login')
     },
   })
 }
