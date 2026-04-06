@@ -12,10 +12,10 @@ export const Hero = () => {
       <div
         className="absolute inset-0 bg-cover bg-center opacity-30"
         style={{
-          backgroundImage: `url('https://image.tmdb.org/t/p/original/628Dep6AxEtDxjZoGP78TsOxYbK.jpg')`,
+          backgroundImage: `url('/hero.png')`,
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+      
 
       {/* Content */}
       <div className="relative z-10 text-center text-white px-4 max-w-3xl mx-auto">
