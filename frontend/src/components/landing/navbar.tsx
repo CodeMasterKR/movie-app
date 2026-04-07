@@ -6,9 +6,11 @@ import { Film, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const NAV_LINKS = [
-  { name: "Filmlar",     href: "#featured"  },
-  { name: "Janrlar",     href: "#genres"    },
-  { name: "Top filmlar", href: "#top-rated" },
+  { name: "Asosiy Sahifa",     href: "#featured"  },
+  { name: "Narxlar",     href: "#genres"    },
+  { name: "Kinolar", href: "#top-rated" },
+  { name: "Seriallar", href: "#top-rated" },
+  { name: "FAQ", href: "#top-rated" },
 ]
 
 export const Navbar = () => {
@@ -22,7 +24,7 @@ export const Navbar = () => {
   }, [])
 
   return (
-    <nav className={`fixed top-7 left-20 right-20 z-50 transition-all duration-300 rounded-[20px] ${
+    <nav className={`fixed top-7 left-20 right-20 z-50 transition-all duration-300 rounded-[20px] border-emerald-500 ${
       isScrolled
         ? 'bg-black/15 backdrop-blur-md shadow-lg shadow-black/20 border-emerald-500 border'
         : 'bg-transparent'
@@ -31,11 +33,9 @@ export const Navbar = () => {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 text-white font-bold text-xl">
-          <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
-            <Film size={18} className="text-white" />
-          </div>
+          <img src="/logo-dark.png" alt="logo rasmi bor" className='w-16'/>
           <span className="tracking-tight">
-            Movie<span className="text-emerald-400">App</span>
+            Movie<span className="text-emerald-400">Nex</span>
           </span>
         </Link>
 
@@ -45,7 +45,7 @@ export const Navbar = () => {
             <Link
               key={link.name}
               href={link.href}
-              className="px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition"
+              className="px-4 py-2 text-md text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition"
             >
               {link.name}
             </Link>
@@ -57,13 +57,13 @@ export const Navbar = () => {
           <Link href="/auth/login">
             <Button
               variant="ghost"
-              className="text-gray-300 hover:text-white hover:bg-white/10"
+              className="text-gray-300 text-md hover:text-white hover:bg-white/10"
             >
               Kirish
             </Button>
           </Link>
           <Link href="/auth/register">
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-5">
+            <Button className="bg-emerald-500 text-md hover:bg-emerald-600 text-white rounded-lg px-5">
               Ro'yxatdan o'tish
             </Button>
           </Link>
